@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0ea5a4">
+<title>Gyangati Expense Manager</title>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f4f8fb;color:#172033}
+header{background:linear-gradient(120deg,#087f8c,#5b21b6,#0ea5a4,#7c3aed);background-size:300% 300%;animation:gradientShift 8s ease infinite;color:white;padding:18px 15px 24px;position:relative;overflow:hidden;box-shadow:0 4px 20px #0003}
+@keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+header::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 20% 120%,#ffffff33,transparent 55%);pointer-events:none}
+header h1{margin:0;font-size:24px;text-shadow:0 2px 8px #0003}.sub{opacity:.92;margin-top:4px;font-size:13px}
+.bottle{position:absolute;right:18px;top:8px;font-size:58px;animation:float 2.5s ease-in-out infinite;filter:drop-shadow(0 4px 8px #0004)}
+@keyframes float{50%{transform:translateY(-8px) rotate(3deg)}}
+.drop{position:absolute;font-size:18px;animation:drop 3s linear infinite;opacity:.8}.d1{right:80px;top:20px}.d2{right:110px;top:65px;animation-delay:1s}
+@keyframes drop{0%{transform:translateY(-20px);opacity:0}30%{opacity:1}100%{transform:translateY(100px);opacity:0}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes popIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+@keyframes shimmer{0%{background-position:-200px 0}100%{background-position:calc(200px + 100%) 0}}
+@keyframes pulseGlow{0%,100%{box-shadow:0 4px 15px #0ea5a455}50%{box-shadow:0 6px 24px #0ea5a4aa}}
+@keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-4deg)}75%{transform:rotate(4deg)}}
+nav{display:flex;gap:6px;overflow-x:auto;background:white;padding:8px;position:sticky;top:0;z-index:5;box-shadow:0 2px 8px #0001}
+nav button{border:0;background:#eef2ff;padding:10px 13px;border-radius:12px;white-space:nowrap;font-weight:bold;color:#374151;transition:all .25s cubic-bezier(.34,1.56,.64,1)}
+nav button:active{transform:scale(.93)}
+nav button.active{background:linear-gradient(135deg,#0ea5a4,#0d9488);color:white;box-shadow:0 3px 10px #0ea5a466;transform:translateY(-1px)}
+main{max-width:850px;margin:auto;padding:12px}
+.page{display:none}.page.active{display:block;animation:fadeInUp .38s ease both}
+.card{background:white;border-radius:18px;padding:15px;margin:10px 0;box-shadow:0 4px 15px #0000000b;animation:popIn .35s ease both;transition:box-shadow .25s,transform .25s}
+.card:hover{box-shadow:0 8px 26px #0001;transform:translateY(-1px)}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.stat{padding:13px;border-radius:15px;background:linear-gradient(135deg,#ecfeff,#f5f3ff);position:relative;overflow:hidden;transition:transform .25s;animation:popIn .4s ease both}
+.stat:hover{transform:translateY(-2px) scale(1.02)}
+.stat b{display:block;font-size:20px;margin-top:5px;background:linear-gradient(135deg,#0ea5a4,#5b21b6);-webkit-background-clip:text;background-clip:text;color:transparent}
+label{display:block;font-size:13px;font-weight:bold;margin:9px 0 5px}
+input,select,textarea{width:100%;padding:11px;border:1px solid #d8dee9;border-radius:10px;font-size:15px;background:white;transition:border-color .2s,box-shadow .2s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#0ea5a4;box-shadow:0 0 0 3px #0ea5a42a}
+textarea{min-height:70px;resize:vertical}
+button{font-family:inherit;cursor:pointer}
+.primary,.danger,.secondary{border:0;border-radius:11px;padding:11px 14px;font-weight:bold;margin-top:9px;transition:transform .18s,box-shadow .18s;position:relative}
+.primary:active,.danger:active,.secondary:active{transform:scale(.96)}
+.primary{background:linear-gradient(135deg,#0ea5a4,#0d9488);color:white;box-shadow:0 4px 14px #0ea5a44d}
+.primary:hover{box-shadow:0 6px 20px #0ea5a473}
+.secondary{background:#ede9fe;color:#5b21b6}.secondary:hover{background:#e0d9fc}
+.danger{background:#fee2e2;color:#b91c1c}.danger:hover{background:#fecaca}
+.whatsapp{background:linear-gradient(135deg,#25d366,#128c7e);color:white;box-shadow:0 4px 14px #25d3664d}
+.whatsapp:hover{box-shadow:0 6px 20px #25d36673}
+.callbtn{background:linear-gradient(135deg,#f59e0b,#d97706);color:white;box-shadow:0 4px 14px #f59e0b4d}
+.callbtn:hover{box-shadow:0 6px 20px #f59e0b73}
+.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1;min-width:120px}
+h2,h3{margin:5px 0 10px}
+.muted{color:#64748b;font-size:13px}
+.calendar-head{display:flex;justify-content:space-between;align-items:center}.calendar-head button{border:0;background:#eef2ff;border-radius:10px;padding:8px 12px;transition:transform .2s}.calendar-head button:active{transform:scale(.9) rotate(-8deg)}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:10px}
+.cal div{text-align:center;padding:8px 2px;border-radius:9px;font-size:12px;transition:transform .15s}
+.dow{font-weight:bold;color:#64748b}
+.day{background:#f8fafc;min-height:39px;cursor:pointer}.day:hover{transform:scale(1.08)}
+.day.has{background:linear-gradient(135deg,#ccfbf1,#a7f3d0);font-weight:bold;color:#075e54}
+.day.today{outline:2px solid #8b5cf6;animation:pulseGlow 2s ease infinite}
+.day.sel{background:linear-gradient(135deg,#0ea5a4,#0d9488);color:white;transform:scale(1.06);box-shadow:0 3px 10px #0ea5a466}
+.table{width:100%;border-collapse:collapse;font-size:13px}.table th,.table td{padding:8px 5px;border-bottom:1px solid #e5e7eb;text-align:left}
+.table tr{transition:background .2s}.table tbody tr:hover{background:#f8fafc}
+.badge{display:inline-block;padding:4px 8px;border-radius:20px;background:#ede9fe;color:#5b21b6;font-size:11px;font-weight:bold}
+.hidden{display:none}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%) translateY(20px);background:#172033;color:white;padding:11px 16px;border-radius:12px;display:none;z-index:20;box-shadow:0 8px 24px #0006}
+.toast.show{display:block;animation:toastIn .3s cubic-bezier(.34,1.56,.64,1) forwards}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.print-only{display:none}
+.chip{display:inline-block;padding:9px 14px;margin:4px;border-radius:20px;background:#eef2ff;color:#374151;font-weight:bold;font-size:13px;cursor:pointer;border:1px solid #e0e7ff;transition:all .2s}
+.chip:hover{background:#e0e7ff;transform:translateY(-1px)}
+.chip.sel{background:linear-gradient(135deg,#0ea5a4,#0d9488);color:white;border-color:transparent;box-shadow:0 3px 10px #0ea5a466}
+.chiplist{max-height:220px;overflow:auto;padding:4px 0}
+.avatar{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#0ea5a4,#5b21b6);color:white;font-weight:bold;font-size:17px;margin-right:10px;flex-shrink:0}
+.sendhead{display:flex;align-items:center;margin-bottom:6px}
+.glowcard{background:linear-gradient(135deg,#fff7ed,#fef9c3);border:1px solid #fde68a}
+@media(min-width:650px){.grid{grid-template-columns:repeat(4,1fr)}}
+@media print{
+nav,.no-print,header{display:none!important}.page{display:block!important}.card{box-shadow:none;border:1px solid #ddd}.print-only{display:block}
+body{background:white}
+html,body,.stat,.stat b,.badge,.day.has,.day.sel{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}
+.stat b{background:none!important;-webkit-text-fill-color:#0d6d6a!important;color:#0d6d6a!important}
+}
+</style>
+</head>
+<body>
+<header>
+<div class="bottle">🥛</div><div class="drop d1">💧</div><div class="drop d2">💧</div>
+<h1>Gyangati Expense Manager</h1><div class="sub" data-i18n="subTitle">Milk • Farmers • Udhar • Payments • Profit</div>
+<div style="margin-top:10px"><select id="languageSelect" style="width:auto;padding:7px 10px;border-radius:9px;border:0;font-weight:bold"><option value="en">English</option><option value="hi">हिन्दी</option></select></div>
+</header>
+
+<nav class="no-print">
+<button data-page="home" class="active" data-i18n="navHome">🏠 Home</button>
+<button data-page="entry" data-i18n="navEntry">➕ One Entry</button>
+<button data-page="farmers" data-i18n="navFarmers">👨‍🌾 Farmers</button>
+<button data-page="send" data-i18n="navSend">📤 Send Info</button>
+<button data-page="sales" data-i18n="navSales">🛒 Sales</button>
+<button data-page="backup" data-i18n="navBackup">💾 Backup</button>
+</nav>
+
+<main>
+<section id="home" class="page active">
+<div class="card">
+<h2 data-i18n="homeTitle">📅 Daily Calendar</h2>
+<div class="calendar-head"><button id="prevMonth">‹</button><b id="monthTitle"></b><button id="nextMonth">›</button></div>
+<div class="cal" id="calendar"></div>
+<div id="selectedDay" class="muted" style="margin-top:10px" data-i18n="tapDate">Tap a date to see its summary.</div>
+</div>
+<div class="grid">
+<div class="stat"><span data-i18n="milk">Milk</span> <b id="sMilk">0 L</b></div>
+<div class="stat"><span data-i18n="milkValue">Milk Value</span> <b id="sValue">₹0</b></div>
+<div class="stat"><span data-i18n="totalIOwe">🔴 I Owe Farmers (Total)</span> <b id="sOwe">₹0</b></div>
+<div class="stat"><span data-i18n="udhar">Farmer Owes Me</span> <b id="sUdhar">₹0</b></div>
+<div class="stat"><span data-i18n="balance">Cash Balance</span> <b id="sBalance">₹0</b></div>
+</div>
+<div class="card">
+<h3 data-i18n="quickActions">⚡ Quick Actions</h3>
+<div class="row">
+<button class="primary" id="goEntry" data-i18n="addFarmer">➕ Add Farmer Entry</button>
+<button class="secondary" id="goFarmer" data-i18n="farmerHub">👨‍🌾 Farmer Hub</button>
+</div>
+</div>
+</section>
+
+<section id="entry" class="page">
+<div class="card">
+<h2 data-i18n="entryTitle">➕ One-Click Daily Entry</h2>
+<p class="muted" data-i18n="entryDesc">Enter everything in one place. Milk value becomes money I owe the farmer; extra/udhar becomes money the farmer owes me.</p>
+<div id="editMode" class="hidden" style="background:#fff7ed;padding:10px;border-radius:10px"><b data-i18n="editingEntry">✏️ Editing entry</b><button class="secondary" id="cancelEdit" style="float:right;margin:0" data-i18n="cancel">Cancel</button></div>
+<label data-i18n="labelDate">Date</label><input id="eDate" type="date">
+<div class="row" style="margin-top:6px"><button type="button" class="secondary" id="eDateToday" style="margin:0" data-i18n="btnToday">Today</button><button type="button" class="secondary" id="eDateYesterday" style="margin:0" data-i18n="btnYesterday">Yesterday</button></div>
+<label data-i18n="labelSession">🕐 Session</label>
+<select id="eSession"><option value="morning" data-i18n="sessionMorning">🌅 Morning</option><option value="evening" data-i18n="sessionEvening">🌇 Evening</option></select>
+<label data-i18n="labelFarmer">Farmer</label><input id="eFarmer" list="farmerList" placeholder="Farmer name" data-i18n-placeholder="farmerPlaceholder">
+<div id="eFarmerHint" class="muted" style="margin-top:4px"></div>
+<datalist id="farmerList"></datalist>
+<label data-i18n="labelMilkSupplied">Milk supplied (litres)</label><input id="eMilk" type="number" min="0" step="0.01" placeholder="e.g. 12.5" data-i18n-placeholder="milkPlaceholder">
+<label data-i18n="labelRate">Rate per litre (₹)</label><input id="eRate" type="number" min="0" step="0.01" placeholder="e.g. 50" data-i18n-placeholder="ratePlaceholder">
+<label data-i18n="labelDest">Milk destination</label><select id="eDest"><option value="Big Business" data-i18n="destBig">Big Business</option><option value="Local" data-i18n="destLocal">Local</option></select>
+<label data-i18n="labelPaid">💵 I paid farmer for milk (₹)</label><input id="ePaid" type="number" min="0" step="0.01" value="0">
+<label data-i18n="labelExtra">➕ I gave farmer extra / udhar (₹)</label><input id="eExtra" type="number" min="0" step="0.01" value="0">
+<label data-i18n="labelReturn">↩️ Farmer returned udhar (₹)</label><input id="eReturn" type="number" min="0" step="0.01" value="0">
+<label data-i18n="labelReturnDate">📅 Return date (jab farmer paisa de)</label><input id="eReturnDate" type="date">
+<label data-i18n="labelNote">Note</label><textarea id="eNote" placeholder="Optional note" data-i18n-placeholder="notePlaceholder"></textarea>
+<button class="primary" id="saveEntry" style="width:100%" data-i18n="saveEverything">💾 Save Everything</button>
+</div>
+</section>
+
+<section id="farmers" class="page">
+<div class="card">
+<h2 data-i18n="farmerTitle">👨‍🌾 Farmer Hub</h2>
+<p class="muted"><b data-i18n="ruleLabel">Rule:</b> <span data-i18n="ruleText">Farmer gives me milk → I owe the farmer for that milk. If I give extra/udhar → farmer owes me that money.</span></p>
+<label data-i18n="selectFarmer">Select farmer</label>
+<input id="farmerSearchBox" placeholder="🔍 Search farmer..." data-i18n-placeholder="searchFarmerPlaceholder" style="margin-bottom:8px">
+<select id="farmerSelect"><option value="" data-i18n="selectFarmerDefault">-- Select Farmer --</option></select>
+</div>
+<div id="farmerPanel" class="hidden">
+<div class="card glowcard">
+<label data-i18n="phoneLabel">📱 Farmer's Phone Number</label>
+<div class="row">
+<input id="farmerPhoneInput" type="tel" placeholder="e.g. 9876543210" data-i18n-placeholder="phonePlaceholder">
+<button class="secondary" id="savePhoneBtn" data-i18n="savePhone">💾 Save Number</button>
+</div>
+</div>
+<div class="grid">
+<div class="stat"><span data-i18n="milk">Milk</span> <b id="fMilk">0 L</b></div>
+<div class="stat"><span data-i18n="milkValue">Milk Value</span> <b id="fValue">₹0</b></div>
+<div class="stat"><span data-i18n="paidToFarmer">Paid to Farmer</span> <b id="fPaid">₹0</b></div>
+<div class="stat"><span data-i18n="iOweFarmer">🔴 I Owe Farmer</span> <b id="fDue">₹0</b></div>
+<div class="stat"><span data-i18n="farmerTookUdhar">Farmer Took Udhar</span> <b id="fExtra">₹0</b></div>
+<div class="stat"><span data-i18n="farmerReturned">Farmer Returned</span> <b id="fReturn">₹0</b></div>
+<div class="stat"><span data-i18n="farmerOwesMe">🟠 Farmer Owes Me</span> <b id="fPending">₹0</b></div>
+</div>
+<div class="card">
+<h3 data-i18n="netPaymentTitle">💰 Net Payment</h3>
+<div class="stat" style="background:linear-gradient(135deg,#fef9c3,#fee2e2)"><span data-i18n="netPaymentLabel">Net Amount</span> <b id="fNet">₹0</b></div>
+<div id="netPaymentNote" class="muted" style="margin-top:8px"></div>
+</div>
+<div class="card">
+<h3 data-i18n="allOptions">⚡ All Farmer Options</h3>
+<button class="primary" id="farmerNewEntry" style="width:100%" data-i18n="completeEntry">➕ Add another complete entry</button>
+<button class="secondary" id="farmerPdfBtn" style="width:100%" data-i18n="downloadFarmerPdf">📄 Download PDF Report</button>
+</div>
+<div class="card"><h3 data-i18n="history">📋 Farmer History</h3><div style="overflow:auto"><table class="table"><thead><tr><th data-i18n="thDate">Date</th><th data-i18n="thSession">Session</th><th data-i18n="thMilk">Milk</th><th data-i18n="thValue">Value</th><th data-i18n="thPaid">Paid</th><th data-i18n="thUdhar">Udhar</th><th data-i18n="thReturn">Return</th><th data-i18n="thReturnDate">Return Date</th><th data-i18n="thEdit">Edit</th></tr></thead><tbody id="farmerHistory"></tbody></table></div></div>
+</div>
+</section>
+
+<section id="send" class="page">
+<div class="card">
+<h2 data-i18n="sendTitle">📤 Send Info to Customer</h2>
+<p class="muted" data-i18n="sendDesc">Farmer khoje, chune, aur unka pura hisaab WhatsApp par bhejein ya seedha call karein.</p>
+<label data-i18n="labelSearchFarmer">Search &amp; select farmer</label>
+<input id="sendSearch" placeholder="🔍 Type farmer name..." data-i18n-placeholder="searchFarmerPlaceholder">
+<div id="sendChipList" class="chiplist"></div>
+</div>
+<div id="sendPanel" class="hidden">
+<div class="card">
+<div class="sendhead"><div class="avatar" id="sendAvatar">?</div><div><h3 id="sendFarmerName" style="margin:0">-</h3><span class="muted" data-i18n="tapCallOrSend">Confirm number, then call or send</span></div></div>
+<label data-i18n="phoneLabel">📱 Farmer's Phone Number</label>
+<input id="sendPhoneInput" type="tel" placeholder="e.g. 9876543210" data-i18n-placeholder="phonePlaceholder">
+<label data-i18n="messagePreviewLabel">📝 Message Preview</label>
+<textarea id="sendPreview" readonly style="min-height:140px"></textarea>
+<div class="row">
+<button type="button" class="whatsapp" id="sendWhatsappBtn" style="width:100%" data-i18n="sendWhatsapp">📲 Send via WhatsApp</button>
+<button type="button" class="callbtn" id="sendCallBtn" style="width:100%" data-i18n="callFarmer">📞 Call Farmer</button>
+</div>
+</div>
+</div>
+<div id="sendEmpty" class="card muted" data-i18n="noFarmerSelected">👆 Search and tap a farmer above to see their details here.</div>
+</section>
+
+<section id="sales" class="page">
+<div class="card">
+<h2 data-i18n="salesTitle">🛒 Local Sales</h2>
+<div id="editModeSale" class="hidden" style="background:#fff7ed;padding:10px;border-radius:10px"><b data-i18n="editingSale">✏️ Editing sale</b><button class="secondary" id="cancelEditSale" style="float:right;margin:0" data-i18n="cancel">Cancel</button></div>
+<label data-i18n="labelDate">Date</label><input id="saleDate" type="date">
+<div class="row" style="margin-top:6px"><button type="button" class="secondary" id="saleDateToday" style="margin:0" data-i18n="btnToday">Today</button><button type="button" class="secondary" id="saleDateYesterday" style="margin:0" data-i18n="btnYesterday">Yesterday</button></div>
+<label data-i18n="labelSession">🕐 Session</label>
+<select id="saleSession"><option value="morning" data-i18n="sessionMorning">🌅 Morning</option><option value="evening" data-i18n="sessionEvening">🌇 Evening</option></select>
+<label data-i18n="labelMilkSold">Milk sold (litres)</label><input id="saleMilk" type="number" min="0" step="0.01">
+<label data-i18n="labelRate">Rate per litre (₹)</label><input id="saleRate" type="number" min="0" step="0.01">
+<label data-i18n="labelCustomerNote">Customer / Note</label><input id="saleNote">
+<button class="primary" id="saveSale" style="width:100%" data-i18n="saveSale">💾 Save Local Sale</button>
+</div>
+<div class="card"><h3 data-i18n="recentSales">Recent Sales</h3><div style="overflow:auto"><table class="table"><thead><tr><th data-i18n="thDate">Date</th><th data-i18n="thSession">Session</th><th data-i18n="thLitres">Litres</th><th data-i18n="thAmount">Amount</th><th data-i18n="thNote">Note</th><th data-i18n="thEdit">Edit</th></tr></thead><tbody id="salesHistory"></tbody></table></div></div>
+</section>
+
+<section id="backup" class="page">
+<div class="card glowcard">
+<h3 data-i18n="driveCardTitle">☁️ Google Drive Auto-Backup</h3>
+<p class="muted" data-i18n="driveCardDesc">Connect once. After that, every save is copied to your private Google Drive automatically — restore in one tap even after the app is deleted or the phone is changed.</p>
+<div id="driveStatus" class="muted" style="margin:8px 0;font-weight:bold"></div>
+<div class="row">
+<button class="primary" id="connectDriveBtn" data-i18n="connectDriveBtn">🔗 Connect Google Drive</button>
+<button class="secondary" id="restoreDriveBtn" data-i18n="restoreDriveBtn">🔄 Restore from Drive</button>
+</div>
+</div>
+<div class="card">
+<h2 data-i18n="backupTitle">💾 Backup & Restore</h2>
+<p class="muted" data-i18n="backupDesc">Data is saved automatically on this phone/browser. For phone-loss protection, download or share the JSON backup to Google Drive/Gmail/WhatsApp.</p>
+<div class="row">
+<button class="primary" id="downloadBackup" data-i18n="download">⬇️ Download Backup</button>
+<button class="secondary" id="shareBackup" data-i18n="share">📤 Share Backup</button>
+</div>
+<label data-i18n="restoreLabel">Restore from JSON</label><input id="restoreFile" type="file" accept=".json,application/json">
+<button class="secondary" id="printPdf" style="width:100%" data-i18n="pdf">🖨️ Export / Save as PDF</button>
+<button class="danger" id="resetData" style="width:100%" data-i18n="reset">⚠️ Reset All Data</button>
+</div>
+<div class="card"><h3 data-i18n="whatBackedUpTitle">What is backed up?</h3><p class="muted" data-i18n="whatBackedUpDesc">Farmers, daily milk entries, milk value, payments, udhar, returns, local sales, dates and notes.</p></div>
+</section>
+</main>
+<div id="toast" class="toast"></div>
+
+<script>
+(function(){
+"use strict";
+var KEY="gyangati_expense_manager_v1";
+var AUTO="gyangati_expense_manager_auto_v1";
+var data={entries:[],sales:[],farmerPhones:{}};
+var viewDate=new Date(); viewDate.setDate(1);
+var selectedDate=today();
+var currentLang="en";
+
+function today(){
+ var d=new Date(),m=("0"+(d.getMonth()+1)).slice(-2),day=("0"+d.getDate()).slice(-2);
+ return d.getFullYear()+"-"+m+"-"+day;
+}
+function yesterday(){
+ var d=new Date();d.setDate(d.getDate()-1);
+ var m=("0"+(d.getMonth()+1)).slice(-2),day=("0"+d.getDate()).slice(-2);
+ return d.getFullYear()+"-"+m+"-"+day;
+}
+function suggestLastRate(name){
+ name=(name||"").trim(); var hint=document.getElementById("eFarmerHint"); if(!hint)return;
+ if(!name){hint.textContent="";return;}
+ var last=null;
+ for(var i=0;i<data.entries.length;i++){var e=data.entries[i];if(e.farmer===name){if(!last||e.date>=last.date)last=e;}}
+ if(last){
+  var txt="💡 "+T("lastRateHint").replace("{rate}",last.rate).replace("{date}",last.date);
+  hint.innerHTML="<span style=\"text-decoration:underline;cursor:pointer;color:#0d9488\">"+txt+"</span>";
+  hint.onclick=function(){
+   if(!document.getElementById("eRate").value)document.getElementById("eRate").value=last.rate;
+   if(last.dest)document.getElementById("eDest").value=last.dest;
+  };
+ }else{hint.textContent="";hint.onclick=null;}
+}
+function money(n){return "₹"+Number(n||0).toLocaleString("en-IN",{maximumFractionDigits:2});}
+function num(id){return Number(document.getElementById(id).value)||0;}
+function toast(s){var t=document.getElementById("toast");t.textContent=s;t.classList.add("show");clearTimeout(t._h);t._h=setTimeout(function(){t.classList.remove("show");},1800);}
+function save(){localStorage.setItem(KEY,JSON.stringify(data));localStorage.setItem(AUTO,JSON.stringify(data));scheduleDriveBackup();}
+function load(){
+ try{
+  var a=localStorage.getItem(KEY);
+  if(a)data=JSON.parse(a);
+  else{var b=localStorage.getItem(AUTO);if(b)data=JSON.parse(b);}
+ }catch(e){data={entries:[],sales:[],farmerPhones:{}};}
+ if(!data.entries)data.entries=[]; if(!data.sales)data.sales=[]; if(!data.farmerPhones)data.farmerPhones={};
+}
+function setPage(p){
+ var pages=document.querySelectorAll(".page"), buttons=document.querySelectorAll("nav button");
+ for(var i=0;i<pages.length;i++)pages[i].classList.toggle("active",pages[i].id===p);
+ for(var j=0;j<buttons.length;j++)buttons[j].classList.toggle("active",buttons[j].getAttribute("data-page")===p);
+ window.scrollTo(0,0);
+ if(p==="home")renderHome(); if(p==="farmers")renderFarmers(); if(p==="sales")renderSales(); if(p==="send")renderSend();
+}
+function farmers(){
+ var o={},i,e;
+ for(i=0;i<data.entries.length;i++){e=data.entries[i];if(e.farmer)o[e.farmer]=1;}
+ return Object.keys(o).sort();
+}
+function farmerOptionLabel(name){
+ var t=computeFarmerTotals(name), net=t.due-t.pending;
+ if(net>0)return name+" (🔴 "+money(net)+")";
+ if(net<0)return name+" (🟠 "+money(Math.abs(net))+")";
+ return name+" (✅ "+T("netSettledShort")+")";
+}
+function renderFarmerLists(){
+ var fs=document.getElementById("farmerSelect"), dl=document.getElementById("farmerList"), names=farmers(), current=fs.value;
+ fs.innerHTML='<option value="">'+T("selectFarmerDefault")+'</option>';
+ dl.innerHTML="";
+ for(var i=0;i<names.length;i++){
+  var op=document.createElement("option");op.value=names[i];op.textContent=farmerOptionLabel(names[i]);fs.appendChild(op);
+  var op2=document.createElement("option");op2.value=names[i];dl.appendChild(op2);
+ }
+ fs.value=current;
+}
+function renderHome(){
+ var totalMilk=0,totalValue=0,totalUdhar=0,totalPaid=0;
+ for(var i=0;i<data.entries.length;i++){var e=data.entries[i];totalMilk+=e.milk;totalValue+=e.milk*e.rate;totalUdhar+=e.extra-e.returned;totalPaid+=e.paid;}
+ var sales=0;for(var s=0;s<data.sales.length;s++)sales+=data.sales[s].milk*data.sales[s].rate;
+ document.getElementById("sMilk").textContent=totalMilk.toFixed(2)+" L";
+ document.getElementById("sValue").textContent=money(totalValue);
+ document.getElementById("sOwe").textContent=money(totalValue-totalPaid);
+ document.getElementById("sUdhar").textContent=money(totalUdhar);
+ document.getElementById("sBalance").textContent=money(sales-totalPaid-totalUdhar);
+ renderCalendar();
+}
+function renderCalendar(){
+ var y=viewDate.getFullYear(),m=viewDate.getMonth(), title=viewDate.toLocaleString(currentLang==="hi"?"hi-IN":"en-IN",{month:"long",year:"numeric"});
+ document.getElementById("monthTitle").textContent=title;
+ var box=document.getElementById("calendar");box.innerHTML="";
+ var days=[T("dowSun"),T("dowMon"),T("dowTue"),T("dowWed"),T("dowThu"),T("dowFri"),T("dowSat")];
+ for(var d=0;d<7;d++){var x=document.createElement("div");x.className="dow";x.textContent=days[d];box.appendChild(x);}
+ var first=new Date(y,m,1).getDay(), count=new Date(y,m+1,0).getDate();
+ for(var k=0;k<first;k++)box.appendChild(document.createElement("div"));
+ for(var day=1;day<=count;day++){
+  var ds=y+"-"+("0"+(m+1)).slice(-2)+"-"+("0"+day).slice(-2), cell=document.createElement("div");
+  cell.className="day";cell.textContent=day;
+  if(ds===today())cell.className+=" today"; if(ds===selectedDate)cell.className+=" sel";
+  var has=false;for(var i=0;i<data.entries.length;i++)if(data.entries[i].date===ds)has=true;
+  for(var q=0;q<data.sales.length;q++)if(data.sales[q].date===ds)has=true;
+  if(has)cell.className+=" has";
+  (function(date){cell.onclick=function(){selectedDate=date;renderCalendar();showDay(date);};})(ds);
+  box.appendChild(cell);
+ }
+ showDay(selectedDate);
+}
+function currentSession(){
+ return new Date().getHours()<12?"morning":"evening";
+}
+function sessionBadge(sess){
+ sess=sess||"morning";
+ return sess==="evening"?"<span class=\"badge\" style=\"background:#ffedd5;color:#c2410c\">🌇 "+T("sessionEvening")+"</span>":"<span class=\"badge\" style=\"background:#dbeafe;color:#1d4ed8\">🌅 "+T("sessionMorning")+"</span>";
+}
+function showDay(date){
+ var milk=0,value=0,paid=0,extra=0,ret=0,sale=0;
+ var mMilk=0,mSale=0,eMilk=0,eSale=0;
+ for(var i=0;i<data.entries.length;i++){var e=data.entries[i];if(e.date===date){milk+=e.milk;value+=e.milk*e.rate;paid+=e.paid;extra+=e.extra;ret+=e.returned;if((e.session||"morning")==="evening")eMilk+=e.milk;else mMilk+=e.milk;}}
+ for(var j=0;j<data.sales.length;j++){var s=data.sales[j];if(s.date===date){sale+=s.milk*s.rate;if((s.session||"morning")==="evening")eSale+=s.milk*s.rate;else mSale+=s.milk*s.rate;}}
+ document.getElementById("selectedDay").innerHTML="<b>"+date+"</b> — "+T("dayMilk")+": "+milk.toFixed(2)+" L • "+T("dayValue")+": "+money(value)+" • "+T("dayPaid")+": "+money(paid)+" • "+T("dayOwesMe")+": "+money(extra-ret)+" • "+T("daySales")+": "+money(sale)+"<br><span class=\"muted\">🌅 "+T("sessionMorning")+": "+mMilk.toFixed(2)+" L ("+money(mSale)+") &nbsp; 🌇 "+T("sessionEvening")+": "+eMilk.toFixed(2)+" L ("+money(eSale)+")</span>";
+}
+function clearEntry(keepFarmer){
+ document.getElementById("eDate").value=selectedDate||today();
+ document.getElementById("eSession").value=currentSession();
+ if(!keepFarmer)document.getElementById("eFarmer").value="";
+ document.getElementById("eMilk").value="";
+ document.getElementById("eRate").value="";
+ document.getElementById("eDest").value="Big Business";
+ document.getElementById("ePaid").value="0";document.getElementById("eExtra").value="0";document.getElementById("eReturn").value="0";document.getElementById("eReturnDate").value="";document.getElementById("eNote").value="";
+}
+
+var editingIndex=-1;
+function startEdit(index){
+ var e=data.entries[index]; if(!e)return;
+ editingIndex=index;
+ document.getElementById("eDate").value=e.date;
+ document.getElementById("eSession").value=e.session||"morning";
+ document.getElementById("eFarmer").value=e.farmer;
+ document.getElementById("eMilk").value=e.milk;
+ document.getElementById("eRate").value=e.rate;
+ document.getElementById("eDest").value=e.dest||"Big Business";
+ document.getElementById("ePaid").value=e.paid||0;
+ document.getElementById("eExtra").value=e.extra||0;
+ document.getElementById("eReturn").value=e.returned||0;
+ document.getElementById("eReturnDate").value=e.returnDate||"";
+ document.getElementById("eNote").value=e.note||"";
+ document.getElementById("editMode").className="";
+ document.getElementById("saveEntry").textContent=T("updateEntry");
+ setPage("entry");
+}
+function cancelEdit(){
+ editingIndex=-1;
+ document.getElementById("editMode").className="hidden";
+ document.getElementById("saveEntry").textContent=T("saveEverything");
+ clearEntry(false);
+}
+function deleteEntry(index){
+ if(!data.entries[index])return;
+ if(confirm(T("confirmDeleteEntry"))){
+  var farmer=data.entries[index].farmer;
+  data.entries.splice(index,1); save(); renderFarmerLists(); renderHome(); renderFarmers();
+  document.getElementById("farmerSelect").value=farmer; renderFarmerDetail(farmer); toast(T("toastEntryDeleted"));
+ }
+}
+function wireHistoryButtons(){
+ var box=document.getElementById("farmerHistory");
+ box.onclick=function(ev){
+  var t=ev.target;
+  if(t.classList.contains("editEntry"))startEdit(Number(t.getAttribute("data-index")));
+  else if(t.classList.contains("deleteEntry"))deleteEntry(Number(t.getAttribute("data-index")));
+ };
+}
+function updateEntryOrSave(){
+ var farmer=document.getElementById("eFarmer").value.trim(), milk=num("eMilk"), rate=num("eRate");
+ if(!farmer){toast(T("toastEnterFarmerName"));return}
+ if(milk<=0){toast(T("toastEnterMilkLitres"));return}
+ if(rate<=0){toast(T("toastEnterRate"));return}
+ var returnedAmt=num("eReturn");
+ var obj={date:document.getElementById("eDate").value||today(),session:document.getElementById("eSession").value||"morning",farmer:farmer,milk:milk,rate:rate,dest:document.getElementById("eDest").value,paid:num("ePaid"),extra:num("eExtra"),returned:returnedAmt,returnDate:returnedAmt>0?(document.getElementById("eReturnDate").value||today()):"",note:document.getElementById("eNote").value};
+ var wasEditing=editingIndex>=0;
+ if(wasEditing)data.entries[editingIndex]=obj;else data.entries.push(obj);
+ var farmerToShow=farmer; save(); renderFarmerLists(); renderHome(); renderSales();
+ editingIndex=-1; document.getElementById("editMode").className="hidden"; document.getElementById("saveEntry").textContent=T("saveEverything"); clearEntry(false);
+ toast(wasEditing?T("toastEntryUpdated"):T("toastEverythingSaved"));
+ setPage("farmers"); document.getElementById("farmerSelect").value=farmerToShow; renderFarmerDetail(farmerToShow);
+}
+function saveEntry(){updateEntryOrSave();}
+
+function renderFarmers(){renderFarmerLists();var sel=document.getElementById("farmerSelect").value;if(sel)renderFarmerDetail(sel);else document.getElementById("farmerPanel").className="hidden";}
+function renderFarmerDetail(name){
+ if(!name){document.getElementById("farmerPanel").className="hidden";return}
+ document.getElementById("farmerPanel").className="";
+ var milk=0,value=0,paid=0,extra=0,ret=0,body="";
+ for(var i=0;i<data.entries.length;i++){var e=data.entries[i];if(e.farmer===name){milk+=e.milk;value+=e.milk*e.rate;paid+=e.paid;extra+=e.extra;ret+=e.returned;body+="<tr><td>"+e.date+"</td><td>"+sessionBadge(e.session)+"</td><td>"+e.milk.toFixed(2)+" L</td><td>"+money(e.milk*e.rate)+"</td><td>"+money(e.paid)+"</td><td>"+money(e.extra)+"</td><td>"+money(e.returned)+"</td><td>"+(e.returnDate||"—")+"</td><td><button class=\"secondary editEntry\" data-index=\""+i+"\">✏️</button> <button class=\"danger deleteEntry\" data-index=\""+i+"\">🗑️</button></td></tr>";}}
+ document.getElementById("fMilk").textContent=milk.toFixed(2)+" L";document.getElementById("fValue").textContent=money(value);document.getElementById("fPaid").textContent=money(paid);document.getElementById("fDue").textContent=money(value-paid);document.getElementById("fExtra").textContent=money(extra);document.getElementById("fReturn").textContent=money(ret);document.getElementById("fPending").textContent=money(extra-ret);document.getElementById("farmerHistory").innerHTML=body||('<tr><td colspan="9">'+T("noEntries")+'</td></tr>');
+ var ph=(data.farmerPhones&&data.farmerPhones[name])||"";
+ var phoneEl=document.getElementById("farmerPhoneInput"); if(phoneEl)phoneEl.value=ph;
+ var due=value-paid, pending=extra-ret, net=due-pending;
+ document.getElementById("fNet").textContent=money(Math.abs(net));
+ var noteEl=document.getElementById("netPaymentNote");
+ if(net>0)noteEl.textContent=T("netPayToFarmer");
+ else if(net<0)noteEl.textContent=T("netFarmerPaysYou");
+ else noteEl.textContent=T("netSettled");
+}
+var editingSaleIndex=-1;
+function saveSale(){
+ var milk=num("saleMilk"),rate=num("saleRate");if(milk<=0||rate<=0){toast(T("toastEnterLitresRate"));return}
+ var obj={date:document.getElementById("saleDate").value||today(),session:document.getElementById("saleSession").value||"morning",milk:milk,rate:rate,note:document.getElementById("saleNote").value};
+ var wasEditing=editingSaleIndex>=0;
+ if(wasEditing)data.sales[editingSaleIndex]=obj;else data.sales.push(obj);
+ save();renderSales();renderHome();
+ editingSaleIndex=-1; document.getElementById("editModeSale").className="hidden"; document.getElementById("saveSale").textContent=T("saveSale");
+ document.getElementById("saleDate").value=today();document.getElementById("saleSession").value=currentSession();document.getElementById("saleMilk").value="";document.getElementById("saleRate").value="";document.getElementById("saleNote").value="";
+ toast(wasEditing?T("toastSaleUpdated"):T("toastSaleSaved"));
+}
+function startEditSale(index){
+ var s=data.sales[index]; if(!s)return;
+ editingSaleIndex=index;
+ document.getElementById("saleDate").value=s.date;
+ document.getElementById("saleSession").value=s.session||"morning";
+ document.getElementById("saleMilk").value=s.milk;
+ document.getElementById("saleRate").value=s.rate;
+ document.getElementById("saleNote").value=s.note||"";
+ document.getElementById("editModeSale").className="";
+ document.getElementById("saveSale").textContent=T("updateSale");
+ setPage("sales");
+}
+function cancelEditSale(){
+ editingSaleIndex=-1;
+ document.getElementById("editModeSale").className="hidden";
+ document.getElementById("saveSale").textContent=T("saveSale");
+ document.getElementById("saleDate").value=today();document.getElementById("saleSession").value=currentSession();document.getElementById("saleMilk").value="";document.getElementById("saleRate").value="";document.getElementById("saleNote").value="";
+}
+function deleteSale(index){
+ if(!data.sales[index])return;
+ if(confirm(T("confirmDeleteSale"))){data.sales.splice(index,1); save(); renderSales(); renderHome(); toast(T("toastSaleDeleted"));}
+}
+function wireSalesHistoryButtons(){
+ var box=document.getElementById("salesHistory");
+ box.onclick=function(ev){
+  var t=ev.target;
+  if(t.classList.contains("editSale"))startEditSale(Number(t.getAttribute("data-index")));
+  else if(t.classList.contains("deleteSale"))deleteSale(Number(t.getAttribute("data-index")));
+ };
+}
+function renderSales(){
+ var body="",start=Math.max(0,data.sales.length-30);
+ for(var i=data.sales.length-1;i>=start;i--){var s=data.sales[i];body+="<tr><td>"+s.date+"</td><td>"+sessionBadge(s.session)+"</td><td>"+s.milk.toFixed(2)+" L</td><td>"+money(s.milk*s.rate)+"</td><td>"+(s.note||"")+"</td><td><button class=\"secondary editSale\" data-index=\""+i+"\">✏️</button> <button class=\"danger deleteSale\" data-index=\""+i+"\">🗑️</button></td></tr>";}
+ document.getElementById("salesHistory").innerHTML=body||('<tr><td colspan="6">'+T("noSalesYet")+'</td></tr>');
+}
+/* ===================== GOOGLE DRIVE AUTO-BACKUP =====================
+   SETUP (one-time, done by you — see chat instructions):
+   1) Host this file on a real https:// address (e.g. GitHub Pages).
+   2) Create a Google Cloud OAuth Client ID (Web application) with that
+      address added under "Authorized JavaScript origins".
+   3) Paste the Client ID below, replacing the placeholder text.
+   ===================================================================== */
+var GOOGLE_CLIENT_ID = "PASTE_YOUR_CLIENT_ID_HERE.apps.googleusercontent.com";
+var DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.appdata";
+var driveAccessToken = null;
+var driveTokenClient = null;
+var driveFileId = localStorage.getItem("gyangati_drive_file_id") || null;
+var driveBackupTimer = null;
+
+function driveConfigured(){
+ return GOOGLE_CLIENT_ID && GOOGLE_CLIENT_ID.indexOf("PASTE_YOUR")!==0 && GOOGLE_CLIENT_ID.indexOf(".apps.googleusercontent.com")>0;
+}
+function setDriveStatus(msg){var el=document.getElementById("driveStatus");if(el)el.textContent=msg;}
+function refreshDriveStatusIdle(){
+ if(!driveConfigured()){setDriveStatus(T("driveNotConfigured"));return;}
+ var last=localStorage.getItem("gyangati_drive_last_backup");
+ if(driveAccessToken&&last){setDriveStatus(T("driveLastBackup")+" "+new Date(last).toLocaleString(currentLang==="hi"?"hi-IN":"en-IN"));}
+ else if(localStorage.getItem("gyangati_drive_connected")==="1"){setDriveStatus(T("driveTapToReconnect"));}
+ else{setDriveStatus(T("driveNotConnected"));}
+}
+function initDriveAuth(){
+ if(!driveConfigured())return;
+ if(!window.google||!google.accounts||!google.accounts.oauth2){setTimeout(initDriveAuth,600);return;}
+ if(driveTokenClient)return;
+ driveTokenClient=google.accounts.oauth2.initTokenClient({
+  client_id:GOOGLE_CLIENT_ID,
+  scope:DRIVE_SCOPE,
+  callback:function(){}
+ });
+}
+function ensureDriveToken(onReady){
+ if(!driveConfigured()){toast(T("driveNotConfiguredToast"));return;}
+ if(driveAccessToken){onReady();return;}
+ if(!driveTokenClient)initDriveAuth();
+ if(!driveTokenClient){setTimeout(function(){ensureDriveToken(onReady);},600);return;}
+ driveTokenClient.callback=function(resp){
+  if(resp&&resp.access_token){
+   driveAccessToken=resp.access_token;
+   localStorage.setItem("gyangati_drive_connected","1");
+   refreshDriveStatusIdle();
+   onReady();
+  }else{
+   setDriveStatus(T("driveConnectFailed"));
+  }
+ };
+ var wasConnected=localStorage.getItem("gyangati_drive_connected")==="1";
+ driveTokenClient.requestAccessToken({prompt:wasConnected?"":"consent"});
+}
+function connectDrive(){
+ ensureDriveToken(function(){toast(T("toastDriveConnected"));backupToDrive(false);});
+}
+function backupToDrive(silent){
+ if(!driveConfigured())return;
+ ensureDriveToken(function(){
+  var content=JSON.stringify({app:"Gyangati Expense Manager",version:1,exported:new Date().toISOString(),data:data});
+  var boundary="gyangati_"+Date.now();
+  var metaObj=driveFileId?{name:"gyangati_backup.json"}:{name:"gyangati_backup.json",parents:["appDataFolder"]};
+  var body="--"+boundary+"\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n"+JSON.stringify(metaObj)+"\r\n--"+boundary+"\r\nContent-Type: application/json\r\n\r\n"+content+"\r\n--"+boundary+"--";
+  var url=driveFileId?("https://www.googleapis.com/upload/drive/v3/files/"+driveFileId+"?uploadType=multipart"):"https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart";
+  fetch(url,{method:driveFileId?"PATCH":"POST",headers:{Authorization:"Bearer "+driveAccessToken,"Content-Type":"multipart/related; boundary="+boundary},body:body})
+  .then(function(r){if(!r.ok)throw new Error("upload failed");return r.json();})
+  .then(function(json){
+   if(json&&json.id){driveFileId=json.id;localStorage.setItem("gyangati_drive_file_id",driveFileId);}
+   var now=new Date().toISOString();localStorage.setItem("gyangati_drive_last_backup",now);
+   refreshDriveStatusIdle();
+   if(!silent)toast(T("toastDriveBackupDone"));
+  })
+  .catch(function(){if(!silent)toast(T("toastDriveBackupFailed"));});
+ });
+}
+function scheduleDriveBackup(){
+ if(!driveConfigured())return;
+ clearTimeout(driveBackupTimer);
+ driveBackupTimer=setTimeout(function(){backupToDrive(true);},2500);
+}
+function restoreFromDrive(){
+ ensureDriveToken(function(){
+  fetch("https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&fields=files(id,name,modifiedTime)&orderBy=modifiedTime desc&pageSize=1",{headers:{Authorization:"Bearer "+driveAccessToken}})
+  .then(function(r){return r.json();})
+  .then(function(json){
+   var f=json&&json.files&&json.files[0];
+   if(!f){toast(T("toastNoDriveBackup"));return null;}
+   driveFileId=f.id;localStorage.setItem("gyangati_drive_file_id",driveFileId);
+   return fetch("https://www.googleapis.com/drive/v3/files/"+f.id+"?alt=media",{headers:{Authorization:"Bearer "+driveAccessToken}}).then(function(r){return r.json();});
+  })
+  .then(function(obj){
+   if(!obj)return;
+   var d=obj.data||obj;
+   if(!d.entries||!d.sales){toast(T("toastInvalidBackup"));return;}
+   if(!d.farmerPhones)d.farmerPhones={};
+   data=d; save(); wireHistoryButtons(); wireSalesHistoryButtons(); applyLanguage();
+   toast(T("toastDriveRestored"));
+  })
+  .catch(function(){toast(T("toastDriveRestoreFailed"));});
+ });
+}
+/* ================== END GOOGLE DRIVE AUTO-BACKUP ================== */
+function backupBlob(){
+ return new Blob([JSON.stringify({app:"Gyangati Expense Manager",version:1,exported:new Date().toISOString(),data:data},null,2)],{type:"application/json"});
+}
+function downloadBackup(){
+ var a=document.createElement("a"),url=URL.createObjectURL(backupBlob());a.href=url;a.download="gyangati_expense_backup.json";document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(url)},1000);toast(T("toastBackupDownloaded"));
+}
+function shareBackup(){
+ var file=new File([backupBlob()],"gyangati_expense_backup.json",{type:"application/json"});
+ if(navigator.share){navigator.share({title:T("shareTitle"),text:T("shareText"),files:[file]}).catch(function(){downloadBackup();});}
+ else downloadBackup();
+}
+function restore(ev){
+ var f=ev.target.files&&ev.target.files[0];if(!f)return;
+ var r=new FileReader();r.onload=function(){try{var obj=JSON.parse(r.result);var d=obj.data||obj;if(!d.entries||!d.sales)throw new Error();if(!d.farmerPhones)d.farmerPhones={};data=d;save();wireHistoryButtons();wireSalesHistoryButtons();applyLanguage();toast(T("toastBackupRestored"));}catch(e){toast(T("toastInvalidBackup"));}};r.readAsText(f);
+}
+function resetData(){
+ if(confirm(T("confirmResetAll"))){data={entries:[],sales:[],farmerPhones:{}};save();applyLanguage();toast(T("toastAllDataCleared"));}
+}
+function savePhoneForFarmer(name,phone){
+ if(!name)return; data.farmerPhones=data.farmerPhones||{}; data.farmerPhones[name]=(phone||"").trim(); save();
+}
+function filterFarmerDropdown(q){
+ var fs=document.getElementById("farmerSelect"); if(!fs)return;
+ var names=farmers(), f=(q||"").toLowerCase().trim();
+ var filtered=f?names.filter(function(n){return n.toLowerCase().indexOf(f)>=0;}):names;
+ var current=fs.value;
+ fs.innerHTML='<option value="">'+T("selectFarmerDefault")+'</option>';
+ for(var i=0;i<filtered.length;i++){var op=document.createElement("option");op.value=filtered[i];op.textContent=farmerOptionLabel(filtered[i]);fs.appendChild(op);}
+ if(filtered.indexOf(current)>=0)fs.value=current; else if(filtered.length===1)fs.value=filtered[0];
+}
+function computeFarmerTotals(name){
+ var milk=0,value=0,paid=0,extra=0,ret=0;
+ for(var i=0;i<data.entries.length;i++){var e=data.entries[i];if(e.farmer===name){milk+=e.milk;value+=e.milk*e.rate;paid+=e.paid;extra+=e.extra;ret+=e.returned;}}
+ return {milk:milk,value:value,paid:paid,extra:extra,ret:ret,due:value-paid,pending:extra-ret};
+}
+function farmerDateRange(name){
+ var min=null,max=null;
+ for(var i=0;i<data.entries.length;i++){var e=data.entries[i];if(e.farmer===name){if(!min||e.date<min)min=e.date;if(!max||e.date>max)max=e.date;}}
+ return {from:min,to:max};
+}
+function buildFarmerMessage(name){
+ var t=computeFarmerTotals(name), net=t.due-t.pending, lines=[], range=farmerDateRange(name);
+ lines.push("🐄 *"+T("shareGreeting").replace("{name}",name)+"*");
+ lines.push("");
+ if(net>0){lines.push("👉 *"+T("netPayToFarmer")+": "+money(net)+"*");}
+ else if(net<0){lines.push("👉 *"+T("netFarmerPaysYou")+": "+money(Math.abs(net))+"*");}
+ else{lines.push("✅ *"+T("netSettled")+"*");}
+ lines.push("");
+ if(range.from&&range.to)lines.push("📅 "+range.from+" → "+range.to);
+ lines.push(T("dayMilk")+": "+t.milk.toFixed(2)+" L");
+ lines.push(T("milkValue")+": "+money(t.value));
+ lines.push(T("paidToFarmer")+": "+money(t.paid));
+ lines.push(T("farmerTookUdhar")+": "+money(t.extra));
+ lines.push(T("farmerReturned")+": "+money(t.ret));
+ lines.push("");
+ lines.push("_"+T("shareFooterNote")+"_");
+ lines.push("— Gyangati Expense Manager");
+ return lines.join("\n");
+}
+function renderSendChips(filter){
+ var box=document.getElementById("sendChipList"); if(!box)return;
+ var names=farmers(), f=(filter||"").toLowerCase().trim();
+ if(f)names=names.filter(function(n){return n.toLowerCase().indexOf(f)>=0;});
+ var current=document.getElementById("sendFarmerName").getAttribute("data-current")||"";
+ box.innerHTML="";
+ if(!names.length){box.innerHTML='<span class="muted">'+T("noFarmersFound")+'</span>';return;}
+ for(var i=0;i<names.length;i++){
+  var chip=document.createElement("span"); chip.className="chip"+(names[i]===current?" sel":""); chip.textContent="👨‍🌾 "+names[i];
+  (function(nm){chip.onclick=function(){selectSendFarmer(nm);};})(names[i]);
+  box.appendChild(chip);
+ }
+}
+function selectSendFarmer(name){
+ var nameEl=document.getElementById("sendFarmerName");
+ nameEl.setAttribute("data-current",name); nameEl.textContent=name;
+ document.getElementById("sendAvatar").textContent=name.charAt(0).toUpperCase();
+ document.getElementById("sendPhoneInput").value=(data.farmerPhones&&data.farmerPhones[name])||"";
+ document.getElementById("sendPreview").value=buildFarmerMessage(name);
+ document.getElementById("sendPanel").className="";
+ document.getElementById("sendEmpty").className="hidden";
+ renderSendChips(document.getElementById("sendSearch").value);
+}
+function renderSend(){
+ renderSendChips(document.getElementById("sendSearch").value||"");
+ var current=document.getElementById("sendFarmerName").getAttribute("data-current");
+ if(current&&farmers().indexOf(current)>=0)selectSendFarmer(current);
+}
+function normalizedPhone(p){
+ var digits=(p||"").replace(/\D/g,"");
+ if(digits.length===10)digits="91"+digits;
+ return digits;
+}
+function escapeHtml(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function generateFarmerReportHTML(name){
+ var t=computeFarmerTotals(name), net=t.due-t.pending, range=farmerDateRange(name);
+ var phone=(data.farmerPhones&&data.farmerPhones[name])||"";
+ var rows="", list=[];
+ for(var i=0;i<data.entries.length;i++)if(data.entries[i].farmer===name)list.push(data.entries[i]);
+ list.sort(function(a,b){return a.date<b.date?-1:a.date>b.date?1:0;});
+ for(var j=0;j<list.length;j++){
+  var e=list[j], sess=(e.session==="evening")?("🌇 "+T("sessionEvening")):("🌅 "+T("sessionMorning"));
+  rows+="<tr><td>"+escapeHtml(e.date)+"</td><td>"+sess+"</td><td>"+e.milk.toFixed(2)+" L</td><td>"+money(e.milk*e.rate)+"</td><td>"+money(e.paid)+"</td><td>"+money(e.extra)+"</td><td>"+money(e.returned)+"</td><td>"+(e.returnDate||"—")+"</td><td>"+escapeHtml(e.note||"")+"</td></tr>";
+ }
+ if(!rows)rows="<tr><td colspan=\"9\" style=\"text-align:center;color:#94a3b8;padding:18px\">"+T("noEntries")+"</td></tr>";
+ var netHtml = net>0
+  ? "<div class=\"netbox netdue\"><div class=\"netlabel\">"+T("netPayToFarmer")+"</div><div class=\"netamt\">"+money(net)+"</div></div>"
+  : net<0
+   ? "<div class=\"netbox netowed\"><div class=\"netlabel\">"+T("netFarmerPaysYou")+"</div><div class=\"netamt\">"+money(Math.abs(net))+"</div></div>"
+   : "<div class=\"netbox netclear\"><div class=\"netlabel\">"+T("netSettled")+"</div></div>";
+ var generatedOn=new Date().toLocaleString(currentLang==="hi"?"hi-IN":"en-IN");
+ var rangeTxt=(range.from&&range.to)?(range.from+" &nbsp;→&nbsp; "+range.to):"—";
+ return "<!DOCTYPE html><html lang=\""+currentLang+"\"><head><meta charset=\"UTF-8\"><title>"+escapeHtml(name)+" - Gyangati Dairy</title><style>"+
+ "@page{margin:16mm 12mm}"+
+ "*{box-sizing:border-box}"+
+ "html,body{-webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact}"+
+ "body{font-family:Arial,Helvetica,sans-serif;color:#172033;margin:0;padding:0;background:#fff}"+
+ ".hdr{background:linear-gradient(120deg,#087f8c,#5b21b6,#0ea5a4,#7c3aed);color:#fff;padding:26px 28px;border-radius:0 0 18px 18px}"+
+ ".hdr h1{margin:0;font-size:24px}"+
+ ".hdr .tag{opacity:.9;font-size:13px;margin-top:4px}"+
+ ".meta{display:flex;justify-content:space-between;align-items:center;margin-top:18px;flex-wrap:wrap;gap:10px}"+
+ ".farmerbox{display:flex;align-items:center;gap:12px}"+
+ ".avatar{width:52px;height:52px;border-radius:50%;background:#ffffff33;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:20px;border:2px solid #ffffff66}"+
+ ".farmername{font-size:19px;font-weight:bold;margin:0}"+
+ ".farmerphone{font-size:13px;opacity:.9}"+
+ ".genon{font-size:11px;opacity:.85;text-align:right}"+
+ ".content{padding:20px 28px}"+
+ ".grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0 20px}"+
+ ".stat{background:linear-gradient(135deg,#ecfeff,#f5f3ff);border-radius:12px;padding:12px;text-align:center}"+
+ ".stat .l{font-size:11px;color:#64748b;font-weight:bold}"+
+ ".stat .v{font-size:17px;font-weight:bold;margin-top:4px;color:#0d6d6a}"+
+ ".netbox{border-radius:14px;padding:16px 20px;margin:6px 0 22px;text-align:center}"+
+ ".netdue{background:linear-gradient(135deg,#fee2e2,#fecaca)}"+
+ ".netowed{background:linear-gradient(135deg,#ffedd5,#fed7aa)}"+
+ ".netclear{background:linear-gradient(135deg,#dcfce7,#bbf7d0)}"+
+ ".netlabel{font-size:13px;font-weight:bold;color:#374151}"+
+ ".netamt{font-size:26px;font-weight:bold;color:#172033;margin-top:4px}"+
+ ".rangebox{font-size:12px;color:#64748b;margin-bottom:10px}"+
+ "table{width:100%;border-collapse:collapse;font-size:11.5px}"+
+ "thead th{background:#0d9488;color:#fff;padding:8px 6px;text-align:left}"+
+ "tbody td{padding:7px 6px;border-bottom:1px solid #e5e7eb}"+
+ "tbody tr:nth-child(even){background:#f8fafc}"+
+ ".footer{margin-top:24px;padding-top:12px;border-top:1px dashed #cbd5e1;font-size:11px;color:#94a3b8;text-align:center}"+
+ "@media print{.hdr{border-radius:0}.hdr,.stat,.netbox,thead th,tbody tr:nth-child(even){-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}}"+
+ "</style></head><body>"+
+ "<div class=\"hdr\"><h1>🥛 Gyangati Dairy</h1><div class=\"tag\">"+escapeHtml(T("subTitle"))+"</div>"+
+ "<div class=\"meta\"><div class=\"farmerbox\"><div class=\"avatar\">"+escapeHtml(name.charAt(0).toUpperCase())+"</div><div><p class=\"farmername\">"+escapeHtml(name)+"</p><div class=\"farmerphone\">📱 "+escapeHtml(phone||"—")+"</div></div></div>"+
+ "<div class=\"genon\">"+T("pdfGeneratedOn")+"<br>"+generatedOn+"</div></div></div>"+
+ "<div class=\"content\">"+
+ "<div class=\"rangebox\">📅 "+T("pdfPeriod")+": "+rangeTxt+"</div>"+
+ "<div class=\"grid\">"+
+ "<div class=\"stat\"><div class=\"l\">"+T("milk")+"</div><div class=\"v\">"+t.milk.toFixed(2)+" L</div></div>"+
+ "<div class=\"stat\"><div class=\"l\">"+T("milkValue")+"</div><div class=\"v\">"+money(t.value)+"</div></div>"+
+ "<div class=\"stat\"><div class=\"l\">"+T("paidToFarmer")+"</div><div class=\"v\">"+money(t.paid)+"</div></div>"+
+ "<div class=\"stat\"><div class=\"l\">"+T("iOweFarmer")+"</div><div class=\"v\">"+money(t.due)+"</div></div>"+
+ "<div class=\"stat\"><div class=\"l\">"+T("farmerTookUdhar")+"</div><div class=\"v\">"+money(t.extra)+"</div></div>"+
+ "<div class=\"stat\"><div class=\"l\">"+T("farmerReturned")+"</div><div class=\"v\">"+money(t.ret)+"</div></div>"+
+ "<div class=\"stat\"><div class=\"l\">"+T("farmerOwesMe")+"</div><div class=\"v\">"+money(t.pending)+"</div></div>"+
+ "<div class=\"stat\"><div class=\"l\">"+T("history")+"</div><div class=\"v\">"+list.length+"</div></div>"+
+ "</div>"+
+ netHtml+
+ "<h3>"+T("history")+"</h3>"+
+ "<table><thead><tr><th>"+T("thDate")+"</th><th>"+T("thSession")+"</th><th>"+T("thMilk")+"</th><th>"+T("thValue")+"</th><th>"+T("thPaid")+"</th><th>"+T("thUdhar")+"</th><th>"+T("thReturn")+"</th><th>"+T("thReturnDate")+"</th><th>"+T("thNote")+"</th></tr></thead><tbody>"+rows+"</tbody></table>"+
+ "<div class=\"footer\">"+T("pdfFooter")+"</div>"+
+ "</div></body></html>";
+}
+function downloadFarmerPdf(name){
+ var html=generateFarmerReportHTML(name);
+ var w=window.open("","_blank");
+ if(!w){toast(T("toastPopupBlocked"));return;}
+ w.document.open();w.document.write(html);w.document.close();
+ w.document.title=name+" - Gyangati Dairy";
+ setTimeout(function(){try{w.focus();w.print();}catch(e){}},400);
+}
+function doSendWhatsapp(){
+ var name=document.getElementById("sendFarmerName").getAttribute("data-current");
+ var phone=document.getElementById("sendPhoneInput").value;
+ if(!name){toast(T("noFarmerSelected"));return;}
+ if(!phone){toast(T("toastEnterPhone"));return;}
+ savePhoneForFarmer(name,phone);
+ var digits=normalizedPhone(phone);
+ var a=document.createElement("a");
+ a.href="https://wa.me/"+digits+"?text="+encodeURIComponent(document.getElementById("sendPreview").value);
+ a.target="_blank";
+ a.rel="noopener noreferrer";
+ a.style.display="none";
+ document.body.appendChild(a);
+ a.click();
+ setTimeout(function(){document.body.removeChild(a);},500);
+}
+function doCallFarmer(){
+ var name=document.getElementById("sendFarmerName").getAttribute("data-current");
+ var phone=document.getElementById("sendPhoneInput").value;
+ if(!name){toast(T("noFarmerSelected"));return;}
+ if(!phone){toast(T("toastEnterPhone"));return;}
+ savePhoneForFarmer(name,phone);
+ var digits=phone.replace(/[^\d+]/g,"");
+ var a=document.createElement("a");
+ a.href="tel:"+digits;
+ a.style.display="none";
+ document.body.appendChild(a);
+ a.click();
+ setTimeout(function(){document.body.removeChild(a);},500);
+}
+
+var translations={
+en:{
+subTitle:"Milk • Farmers • Udhar • Payments • Profit",
+navHome:"🏠 Home",navEntry:"➕ One Entry",navFarmers:"👨‍🌾 Farmers",navSend:"📤 Send Info",navSales:"🛒 Sales",navBackup:"💾 Backup",
+homeTitle:"📅 Daily Calendar",tapDate:"Tap a date to see its summary.",
+milk:"Milk",milkValue:"Milk Value",totalIOwe:"🔴 I Owe Farmers (Total)",udhar:"Farmer Owes Me",balance:"Cash Balance",
+btnToday:"📅 Today",btnYesterday:"📅 Yesterday",lastRateHint:"Last rate for this farmer: ₹{rate}/L on {date}. Tap to use.",
+quickActions:"⚡ Quick Actions",addFarmer:"➕ Add Farmer Entry",farmerHub:"👨‍🌾 Farmer Hub",
+entryTitle:"➕ One-Click Daily Entry",
+entryDesc:"Enter everything in one place. Milk value becomes money I owe the farmer; extra/udhar becomes money the farmer owes me.",
+editingEntry:"✏️ Editing entry",cancel:"Cancel",
+labelDate:"Date",labelSession:"🕐 Session",sessionMorning:"🌅 Morning",sessionEvening:"🌇 Evening",labelFarmer:"Farmer",farmerPlaceholder:"Farmer name",
+labelMilkSupplied:"Milk supplied (litres)",milkPlaceholder:"e.g. 12.5",
+labelRate:"Rate per litre (₹)",ratePlaceholder:"e.g. 50",
+labelDest:"Milk destination",destBig:"Big Business",destLocal:"Local",
+labelPaid:"💵 I paid farmer for milk (₹)",labelExtra:"➕ I gave farmer extra / udhar (₹)",labelReturn:"↩️ Farmer returned udhar (₹)",
+labelReturnDate:"📅 Return date (when farmer paid back)",
+labelNote:"Note",notePlaceholder:"Optional note",
+saveEverything:"💾 Save Everything",updateEntry:"💾 Update Entry",
+farmerTitle:"👨‍🌾 Farmer Hub",
+ruleLabel:"Rule:",ruleText:"Farmer gives me milk → I owe the farmer for that milk. If I give extra/udhar → farmer owes me that money.",
+selectFarmer:"Select farmer",selectFarmerDefault:"-- Select Farmer --",
+paidToFarmer:"Paid to Farmer",iOweFarmer:"🔴 I Owe Farmer",farmerTookUdhar:"Farmer Took Udhar",farmerReturned:"Farmer Returned",farmerOwesMe:"🟠 Farmer Owes Me",
+netPaymentTitle:"💰 Net Payment",netPaymentLabel:"Net Amount",
+netPayToFarmer:"🔴 You need to pay the farmer this amount",netFarmerPaysYou:"🟠 The farmer needs to pay you this amount",netSettled:"✅ All settled — nothing due either way",netSettledShort:"Settled",
+allOptions:"⚡ All Farmer Options",completeEntry:"➕ Add another complete entry",downloadFarmerPdf:"📄 Download PDF Report",
+pdfGeneratedOn:"Generated on",pdfPeriod:"Period",pdfFooter:"This is a computer-generated statement from Gyangati Expense Manager. For any query, please contact us.",
+toastPopupBlocked:"Please allow pop-ups to generate the PDF",shareFooterNote:"Thank you for your trust. Please contact us for any questions about this statement.",
+history:"📋 Farmer History",
+thDate:"Date",thSession:"Session",thMilk:"Milk",thValue:"Value",thPaid:"Paid",thUdhar:"Udhar",thReturn:"Return",thReturnDate:"Return Date",thEdit:"Edit",
+noEntries:"No entries",
+searchFarmerPlaceholder:"Search farmer...",
+phoneLabel:"📱 Farmer's Phone Number",phonePlaceholder:"e.g. 9876543210",savePhone:"💾 Save Number",
+toastPhoneSaved:"Phone number saved ✓",toastEnterPhone:"Enter a phone number first",
+sendTitle:"📤 Send Info to Customer",
+sendDesc:"Search a farmer, select them, and send their full account to WhatsApp or call them directly.",
+labelSearchFarmer:"Search & select farmer",
+tapCallOrSend:"Confirm number, then call or send",
+messagePreviewLabel:"📝 Message Preview",
+sendWhatsapp:"📲 Send via WhatsApp",callFarmer:"📞 Call Farmer",
+noFarmerSelected:"👆 Search and tap a farmer above to see their details here.",
+noFarmersFound:"No matching farmers",
+shareGreeting:"Gyangati Dairy account update for {name}",
+salesTitle:"🛒 Local Sales",editingSale:"✏️ Editing sale",
+labelMilkSold:"Milk sold (litres)",labelCustomerNote:"Customer / Note",
+saveSale:"💾 Save Local Sale",updateSale:"💾 Update Sale",
+recentSales:"Recent Sales",thLitres:"Litres",thAmount:"Amount",thNote:"Note",
+noSalesYet:"No sales yet",
+backupTitle:"💾 Backup & Restore",
+backupDesc:"Data is saved automatically on this phone/browser. For phone-loss protection, download or share the JSON backup to Google Drive/Gmail/WhatsApp.",
+download:"⬇️ Download Backup",share:"📤 Share Backup",restoreLabel:"Restore from JSON",
+pdf:"🖨️ Export / Save as PDF",reset:"⚠️ Reset All Data",
+whatBackedUpTitle:"What is backed up?",
+whatBackedUpDesc:"Farmers, daily milk entries, milk value, payments, udhar, returns, local sales, dates and notes.",
+driveCardTitle:"☁️ Google Drive Auto-Backup",
+driveCardDesc:"Connect once. After that, every save is copied to your private Google Drive automatically — restore in one tap even after the app is deleted or the phone is changed.",
+connectDriveBtn:"🔗 Connect Google Drive",restoreDriveBtn:"🔄 Restore from Drive",
+driveNotConfigured:"⚠️ Not set up yet — see setup instructions",
+driveNotConfiguredToast:"Google Drive backup isn't set up yet in this app",
+driveNotConnected:"Not connected",driveTapToReconnect:"Tap 'Connect Google Drive' to resume auto-backup",
+driveConnectFailed:"Could not connect to Google Drive",
+driveLastBackup:"✅ Last backed up:",
+toastDriveConnected:"Google Drive connected ✓",
+toastDriveBackupDone:"Backed up to Google Drive ✓",toastDriveBackupFailed:"Google Drive backup failed",
+toastNoDriveBackup:"No backup found on Google Drive",
+toastDriveRestored:"Data restored from Google Drive ✓",toastDriveRestoreFailed:"Could not restore from Google Drive",
+confirmRestoreDrive:"This will replace all data on this phone with your latest Google Drive backup. Continue?",
+dowSun:"Sun",dowMon:"Mon",dowTue:"Tue",dowWed:"Wed",dowThu:"Thu",dowFri:"Fri",dowSat:"Sat",
+dayMilk:"Milk",dayValue:"Value",dayPaid:"I paid farmer",dayOwesMe:"Farmer owes me",daySales:"Local sales",
+toastEnterFarmerName:"Enter farmer name",toastEnterMilkLitres:"Enter milk litres",toastEnterRate:"Enter rate per litre",
+toastEntryUpdated:"Entry updated ✓",toastEverythingSaved:"Everything saved ✓",
+confirmDeleteEntry:"Delete this farmer entry?",toastEntryDeleted:"Entry deleted",
+toastEnterLitresRate:"Enter litres and rate",
+toastSaleUpdated:"Sale updated ✓",toastSaleSaved:"Sale saved ✓",
+confirmDeleteSale:"Delete this sale?",toastSaleDeleted:"Sale deleted",
+toastBackupDownloaded:"Backup downloaded ✓",
+toastInvalidBackup:"Invalid backup file",toastBackupRestored:"Backup restored ✓",
+confirmResetAll:"Delete all Gyangati Expense data?",toastAllDataCleared:"All data cleared",
+shareTitle:"Gyangati Expense Backup",shareText:"Gyangati Expense Manager backup"
+},
+hi:{
+subTitle:"दूध • किसान • उधार • भुगतान • मुनाफ़ा",
+navHome:"🏠 होम",navEntry:"➕ एक एंट्री",navFarmers:"👨‍🌾 किसान",navSend:"📤 जानकारी भेजें",navSales:"🛒 बिक्री",navBackup:"💾 बैकअप",
+homeTitle:"📅 दैनिक कैलेंडर",tapDate:"सारांश देखने के लिए तारीख़ पर टैप करें।",
+milk:"दूध",milkValue:"दूध की कीमत",totalIOwe:"🔴 मुझे किसानों को कुल देना है",udhar:"किसान को मुझसे लेना है",balance:"कैश बैलेंस",
+btnToday:"📅 आज",btnYesterday:"📅 कल",lastRateHint:"इस किसान की पिछली दर: ₹{rate}/L, {date} को। उपयोग करने के लिए टैप करें।",
+quickActions:"⚡ त्वरित कार्य",addFarmer:"➕ किसान की एंट्री जोड़ें",farmerHub:"👨‍🌾 किसान हिसाब",
+entryTitle:"➕ एक साथ पूरी एंट्री",
+entryDesc:"सब कुछ एक ही जगह भरें। दूध की कीमत वह पैसा है जो मुझे किसान को देना है; अतिरिक्त/उधार वह पैसा है जो किसान को मुझे देना है।",
+editingEntry:"✏️ एंट्री संपादित हो रही है",cancel:"रद्द करें",
+labelDate:"तारीख़",labelSession:"🕐 समय",sessionMorning:"🌅 सुबह",sessionEvening:"🌇 शाम",labelFarmer:"किसान",farmerPlaceholder:"किसान का नाम",
+labelMilkSupplied:"आपूर्ति किया गया दूध (लीटर)",milkPlaceholder:"उदा. 12.5",
+labelRate:"प्रति लीटर दर (₹)",ratePlaceholder:"उदा. 50",
+labelDest:"दूध कहाँ गया",destBig:"बड़ा व्यापार",destLocal:"लोकल",
+labelPaid:"💵 मैंने किसान को दूध के लिए भुगतान किया (₹)",labelExtra:"➕ मैंने किसान को अतिरिक्त/उधार दिया (₹)",labelReturn:"↩️ किसान ने उधार वापस किया (₹)",
+labelReturnDate:"📅 वापसी की तारीख़ (जब किसान पैसा दे)",
+labelNote:"नोट",notePlaceholder:"वैकल्पिक नोट",
+saveEverything:"💾 सब कुछ सेव करें",updateEntry:"💾 एंट्री अपडेट करें",
+farmerTitle:"👨‍🌾 किसान हिसाब",
+ruleLabel:"नियम:",ruleText:"किसान मुझे दूध देता है → मुझे उस दूध के पैसे किसान को देने हैं। अगर मैं अतिरिक्त/उधार दूँ → किसान को वह पैसा मुझे लौटाना है।",
+selectFarmer:"किसान चुनें",selectFarmerDefault:"-- किसान चुनें --",
+paidToFarmer:"किसान को भुगतान",iOweFarmer:"🔴 मुझे किसान को देना है",farmerTookUdhar:"किसान ने उधार लिया",farmerReturned:"किसान ने वापस किया",farmerOwesMe:"🟠 किसान को मुझे देना है",
+netPaymentTitle:"💰 नेट पेमेंट",netPaymentLabel:"कुल राशि",
+netPayToFarmer:"🔴 आपको किसान को यह राशि देनी है",netFarmerPaysYou:"🟠 किसान को आपको यह राशि देनी है",netSettled:"✅ पूरा हिसाब बराबर है — किसी को कुछ नहीं देना",netSettledShort:"बराबर",
+allOptions:"⚡ सभी विकल्प",completeEntry:"➕ पूरी एंट्री जोड़ें",downloadFarmerPdf:"📄 PDF रिपोर्ट डाउनलोड करें",
+pdfGeneratedOn:"तैयार करने की तारीख़",pdfPeriod:"अवधि",pdfFooter:"यह Gyangati Expense Manager द्वारा तैयार किया गया कंप्यूटर-जनित विवरण है। किसी भी प्रश्न के लिए कृपया संपर्क करें।",
+toastPopupBlocked:"PDF बनाने के लिए कृपया पॉप-अप की अनुमति दें",shareFooterNote:"आपके भरोसे के लिए धन्यवाद। इस विवरण से जुड़े किसी भी सवाल के लिए संपर्क करें।",
+history:"📋 किसान का इतिहास",
+thDate:"तारीख़",thSession:"समय",thMilk:"दूध",thValue:"कीमत",thPaid:"भुगतान",thUdhar:"उधार",thReturn:"वापसी",thReturnDate:"वापसी तारीख़",thEdit:"संपादन",
+noEntries:"कोई एंट्री नहीं",
+searchFarmerPlaceholder:"किसान खोजें...",
+phoneLabel:"📱 किसान का फ़ोन नंबर",phonePlaceholder:"उदा. 9876543210",savePhone:"💾 नंबर सेव करें",
+toastPhoneSaved:"फ़ोन नंबर सेव हुआ ✓",toastEnterPhone:"पहले फ़ोन नंबर डालें",
+sendTitle:"📤 ग्राहक को जानकारी भेजें",
+sendDesc:"किसान को खोजें, चुनें, और उसका पूरा हिसाब WhatsApp पर भेजें या सीधा कॉल करें।",
+labelSearchFarmer:"किसान खोजें और चुनें",
+tapCallOrSend:"नंबर देखें, फिर कॉल करें या भेजें",
+messagePreviewLabel:"📝 मैसेज पूर्वावलोकन",
+sendWhatsapp:"📲 WhatsApp पर भेजें",callFarmer:"📞 किसान को कॉल करें",
+noFarmerSelected:"👆 ऊपर किसान खोजें और चुनें ताकि उसका विवरण यहाँ दिखे।",
+noFarmersFound:"कोई मेल खाता किसान नहीं",
+shareGreeting:"{name} के लिए Gyangati Dairy खाता अपडेट",
+salesTitle:"🛒 लोकल बिक्री",editingSale:"✏️ बिक्री संपादित हो रही है",
+labelMilkSold:"बेचा गया दूध (लीटर)",labelCustomerNote:"ग्राहक / नोट",
+saveSale:"💾 लोकल बिक्री सेव करें",updateSale:"💾 बिक्री अपडेट करें",
+recentSales:"हाल की बिक्री",thLitres:"लीटर",thAmount:"राशि",thNote:"नोट",
+noSalesYet:"अभी तक कोई बिक्री नहीं",
+backupTitle:"💾 बैकअप और रिस्टोर",
+backupDesc:"डेटा अपने आप इस फ़ोन/ब्राउज़र में सेव होता है। फ़ोन खोने से बचाव के लिए, JSON बैकअप डाउनलोड करें या Google Drive/Gmail/WhatsApp पर शेयर करें।",
+download:"⬇️ बैकअप डाउनलोड",share:"📤 बैकअप शेयर",restoreLabel:"JSON से रिस्टोर करें",
+pdf:"🖨️ PDF सेव करें",reset:"⚠️ सारा डेटा मिटाएँ",
+whatBackedUpTitle:"क्या बैकअप होता है?",
+whatBackedUpDesc:"किसान, रोज़ की दूध एंट्री, दूध की कीमत, भुगतान, उधार, वापसी, लोकल बिक्री, तारीख़ें और नोट्स।",
+driveCardTitle:"☁️ Google Drive ऑटो-बैकअप",
+driveCardDesc:"एक बार कनेक्ट करें। उसके बाद, हर सेव अपने आप आपके निजी Google Drive में कॉपी हो जाएगा — ऐप डिलीट होने या फ़ोन बदलने पर भी एक टैप में रिस्टोर करें।",
+connectDriveBtn:"🔗 Google Drive कनेक्ट करें",restoreDriveBtn:"🔄 Drive से रिस्टोर करें",
+driveNotConfigured:"⚠️ अभी सेट अप नहीं हुआ — सेटअप निर्देश देखें",
+driveNotConfiguredToast:"इस ऐप में Google Drive बैकअप अभी सेट अप नहीं है",
+driveNotConnected:"कनेक्टेड नहीं",driveTapToReconnect:"ऑटो-बैकअप फिर शुरू करने के लिए 'Google Drive कनेक्ट करें' टैप करें",
+driveConnectFailed:"Google Drive से कनेक्ट नहीं हो सका",
+driveLastBackup:"✅ आख़िरी बैकअप:",
+toastDriveConnected:"Google Drive कनेक्ट हुआ ✓",
+toastDriveBackupDone:"Google Drive पर बैकअप हुआ ✓",toastDriveBackupFailed:"Google Drive बैकअप विफल हुआ",
+toastNoDriveBackup:"Google Drive पर कोई बैकअप नहीं मिला",
+toastDriveRestored:"Google Drive से डेटा रिस्टोर हुआ ✓",toastDriveRestoreFailed:"Google Drive से रिस्टोर नहीं हो सका",
+confirmRestoreDrive:"इससे इस फ़ोन का सारा डेटा आपके नवीनतम Google Drive बैकअप से बदल जाएगा। जारी रखें?",
+dowSun:"रवि",dowMon:"सोम",dowTue:"मंगल",dowWed:"बुध",dowThu:"गुरु",dowFri:"शुक्र",dowSat:"शनि",
+dayMilk:"दूध",dayValue:"कीमत",dayPaid:"मैंने किसान को दिया",dayOwesMe:"किसान को मुझसे लेना है",daySales:"लोकल बिक्री",
+toastEnterFarmerName:"किसान का नाम भरें",toastEnterMilkLitres:"दूध की मात्रा भरें",toastEnterRate:"प्रति लीटर दर भरें",
+toastEntryUpdated:"एंट्री अपडेट हुई ✓",toastEverythingSaved:"सब कुछ सेव हुआ ✓",
+confirmDeleteEntry:"क्या इस किसान एंट्री को मिटाना है?",toastEntryDeleted:"एंट्री मिटाई गई",
+toastEnterLitresRate:"लीटर और दर भरें",
+toastSaleUpdated:"बिक्री अपडेट हुई ✓",toastSaleSaved:"बिक्री सेव हुई ✓",
+confirmDeleteSale:"क्या इस बिक्री को मिटाना है?",toastSaleDeleted:"बिक्री मिटाई गई",
+toastBackupDownloaded:"बैकअप डाउनलोड हुआ ✓",
+toastInvalidBackup:"अमान्य बैकअप फ़ाइल",toastBackupRestored:"बैकअप रिस्टोर हुआ ✓",
+confirmResetAll:"क्या Gyangati Expense का सारा डेटा मिटाना है?",toastAllDataCleared:"सारा डेटा मिटा दिया गया",
+shareTitle:"Gyangati Expense बैकअप",shareText:"Gyangati Expense Manager बैकअप"
+}
+};
+function T(key){var d=translations[currentLang]||translations.en;return (d&&d[key])!==undefined?d[key]:key;}
+function applyLanguage(){
+ currentLang=document.getElementById("languageSelect").value;
+ localStorage.setItem("gyangati_language",currentLang);
+ var els=document.querySelectorAll("[data-i18n]");
+ for(var i=0;i<els.length;i++){var key=els[i].getAttribute("data-i18n");els[i].textContent=T(key);}
+ var pels=document.querySelectorAll("[data-i18n-placeholder]");
+ for(var j=0;j<pels.length;j++){var pkey=pels[j].getAttribute("data-i18n-placeholder");pels[j].setAttribute("placeholder",T(pkey));}
+ renderFarmerLists();
+ renderHome();
+ renderSales();
+ var selFarmer=document.getElementById("farmerSelect").value;
+ if(selFarmer)renderFarmerDetail(selFarmer); else document.getElementById("farmerPanel").className="hidden";
+ if(document.getElementById("send").classList.contains("active"))renderSend();
+ refreshDriveStatusIdle();
+}
+
+function init(){
+ load();
+ currentLang=localStorage.getItem("gyangati_language")||"en";
+ document.getElementById("languageSelect").value=currentLang;
+ document.getElementById("eDate").value=today();document.getElementById("saleDate").value=today();
+ document.getElementById("eSession").value=currentSession();document.getElementById("saleSession").value=currentSession();
+ var nav=document.querySelectorAll("nav button");
+ for(var i=0;i<nav.length;i++){nav[i].onclick=function(){setPage(this.getAttribute("data-page"));};}
+ document.getElementById("goEntry").onclick=function(){setPage("entry");};
+ document.getElementById("goFarmer").onclick=function(){setPage("farmers");};
+ document.getElementById("farmerNewEntry").onclick=function(){setPage("entry");};
+ document.getElementById("saveEntry").onclick=saveEntry;document.getElementById("saveSale").onclick=saveSale; wireHistoryButtons(); wireSalesHistoryButtons(); document.getElementById("cancelEdit").onclick=cancelEdit; document.getElementById("cancelEditSale").onclick=cancelEditSale;
+ document.getElementById("farmerSelect").onchange=function(){renderFarmerDetail(this.value);};
+ document.getElementById("prevMonth").onclick=function(){viewDate.setMonth(viewDate.getMonth()-1);renderCalendar();};
+ document.getElementById("nextMonth").onclick=function(){viewDate.setMonth(viewDate.getMonth()+1);renderCalendar();};
+ document.getElementById("downloadBackup").onclick=downloadBackup;document.getElementById("shareBackup").onclick=shareBackup;
+ document.getElementById("restoreFile").onchange=restore;document.getElementById("resetData").onclick=resetData;
+ document.getElementById("printPdf").onclick=function(){window.print();};
+ document.getElementById("languageSelect").onchange=applyLanguage;
+ document.getElementById("farmerSearchBox").oninput=function(){filterFarmerDropdown(this.value);};
+ document.getElementById("savePhoneBtn").onclick=function(){
+  var name=document.getElementById("farmerSelect").value;
+  if(!name){toast(T("toastEnterFarmerName"));return;}
+  savePhoneForFarmer(name,document.getElementById("farmerPhoneInput").value);
+  toast(T("toastPhoneSaved"));
+ };
+ document.getElementById("sendSearch").oninput=function(){renderSendChips(this.value);};
+ document.getElementById("sendWhatsappBtn").onclick=doSendWhatsapp;
+ document.getElementById("sendCallBtn").onclick=doCallFarmer;
+ document.getElementById("eReturn").oninput=function(){
+  var rd=document.getElementById("eReturnDate");
+  if(Number(this.value)>0&&!rd.value)rd.value=today();
+  if(Number(this.value)<=0)rd.value="";
+ };
+ document.getElementById("eDateToday").onclick=function(){document.getElementById("eDate").value=today();};
+ document.getElementById("eDateYesterday").onclick=function(){document.getElementById("eDate").value=yesterday();};
+ document.getElementById("saleDateToday").onclick=function(){document.getElementById("saleDate").value=today();};
+ document.getElementById("saleDateYesterday").onclick=function(){document.getElementById("saleDate").value=yesterday();};
+ document.getElementById("eFarmer").oninput=function(){suggestLastRate(this.value);};
+ document.getElementById("eFarmer").onchange=function(){suggestLastRate(this.value);};
+ document.getElementById("farmerPdfBtn").onclick=function(){
+  var name=document.getElementById("farmerSelect").value;
+  if(!name){toast(T("toastEnterFarmerName"));return;}
+  downloadFarmerPdf(name);
+ };
+ document.getElementById("connectDriveBtn").onclick=connectDrive;
+ document.getElementById("restoreDriveBtn").onclick=function(){
+  if(confirm(T("confirmRestoreDrive")))restoreFromDrive();
+ };
+ initDriveAuth();
+ refreshDriveStatusIdle();
+ applyLanguage();
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
+</script>
+</body>
+</html>
